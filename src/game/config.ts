@@ -5,7 +5,8 @@ export type Tier = 'common' | 'mid' | 'rare' | 'epic' | 'boss'
 export interface CoinConfig {
   id: string
   ticker: string
-  color: number        // Phaser hex (0xRRGGBB)
+  logo: string         // path to logo image in /public/logos/
+  color: number        // Phaser hex (0xRRGGBB) — used for glow ring
   cssColor: string     // CSS string
   glowColor: string    // CSS rgba for glow
   tier: Tier
@@ -25,6 +26,7 @@ export const COINS: CoinConfig[] = [
   {
     id: 'pepe',
     ticker: 'PEPE',
+    logo: '/logos/pepe.png',
     color: 0x00C846,
     cssColor: '#00C846',
     glowColor: 'rgba(0,200,70,0.35)',
@@ -40,6 +42,7 @@ export const COINS: CoinConfig[] = [
   {
     id: 'bonk',
     ticker: 'BONK',
+    logo: '/logos/bonk.png',
     color: 0xFF6B35,
     cssColor: '#FF6B35',
     glowColor: 'rgba(255,107,53,0.35)',
@@ -55,6 +58,7 @@ export const COINS: CoinConfig[] = [
   {
     id: 'shib',
     ticker: 'SHIB',
+    logo: '/logos/shib.png',
     color: 0xE32234,
     cssColor: '#E32234',
     glowColor: 'rgba(227,34,52,0.35)',
@@ -72,6 +76,7 @@ export const COINS: CoinConfig[] = [
   {
     id: 'doge',
     ticker: 'DOGE',
+    logo: '/logos/doge.png',
     color: 0xC3A634,
     cssColor: '#C3A634',
     glowColor: 'rgba(195,166,52,0.4)',
@@ -87,6 +92,7 @@ export const COINS: CoinConfig[] = [
   {
     id: 'wif',
     ticker: 'WIF',
+    logo: '/logos/wif.png',
     color: 0x7B61FF,
     cssColor: '#7B61FF',
     glowColor: 'rgba(123,97,255,0.4)',
@@ -102,6 +108,7 @@ export const COINS: CoinConfig[] = [
   {
     id: 'floki',
     ticker: 'FLOKI',
+    logo: '/logos/floki.png',
     color: 0xFFBD39,
     cssColor: '#FFBD39',
     glowColor: 'rgba(255,189,57,0.4)',
@@ -119,6 +126,7 @@ export const COINS: CoinConfig[] = [
   {
     id: 'brett',
     ticker: 'BRETT',
+    logo: '/logos/brett.png',
     color: 0x4A90E2,
     cssColor: '#4A90E2',
     glowColor: 'rgba(74,144,226,0.5)',
@@ -132,8 +140,9 @@ export const COINS: CoinConfig[] = [
     swingAmp: 30, swingFreq: 0.6,
   },
   {
-    id: 'mog',
-    ticker: 'MOG',
+    id: 'ponke',
+    ticker: 'PONKE',
+    logo: '/logos/ponke.png',
     color: 0x9B59B6,
     cssColor: '#9B59B6',
     glowColor: 'rgba(155,89,182,0.5)',
@@ -151,6 +160,7 @@ export const COINS: CoinConfig[] = [
   {
     id: 'popcat',
     ticker: 'POPCAT',
+    logo: '/logos/popcat.png',
     color: 0xFF69B4,
     cssColor: '#FF69B4',
     glowColor: 'rgba(255,105,180,0.6)',
@@ -164,8 +174,9 @@ export const COINS: CoinConfig[] = [
     swingAmp: 80, swingFreq: 1.5,
   },
   {
-    id: 'meme',
-    ticker: 'MEME',
+    id: 'mew',
+    ticker: 'MEW',
+    logo: '/logos/mew.png',
     color: 0x00BCD4,
     cssColor: '#00BCD4',
     glowColor: 'rgba(0,188,212,0.6)',

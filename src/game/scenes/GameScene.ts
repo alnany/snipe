@@ -33,7 +33,43 @@ export class GameScene extends Phaser.Scene {
     super({ key: 'GameScene' })
   }
 
+  preload() {
+    // Load real coin logos
+    for (const coin of COINS) {
+      this.load.image(coin.id, coin.logo)
+    }
+  }
+
+  /** Bake each coin logo into a circular clipped texture using canvas */
+  private bakeCoinTextures() {
+    for (const coin of COINS) {
+      const key = `coin_circle_${coin.id}`
+      if (this.textures.exists(key)) continue
+
+      const r = coin.radius * 2 // 2× for crisp rendering
+      const canvas = document.createElement('canvas')
+      canvas.width = r * 2
+      canvas.height = r * 2
+      const ctx = canvas.getContext('2d')
+      if (!ctx) continue
+
+      // Circular clip path
+      ctx.beginPath()
+      ctx.arc(r, r, r, 0, Math.PI * 2)
+      ctx.clip()
+
+      // Draw the logo
+      const src = this.textures.get(coin.id).getSourceImage() as HTMLImageElement
+      ctx.drawImage(src, 0, 0, r * 2, r * 2)
+
+      this.textures.addCanvas(key, canvas)
+    }
+  }
+
   create() {
+    // Bake circular textures from loaded logos
+    this.bakeCoinTextures()
+
     const { width, height } = this.scale
 
     // Background + grid
@@ -98,34 +134,46 @@ export class GameScene extends Phaser.Scene {
   private createCoinContainer(config: CoinConfig, x: number, y: number): Phaser.GameObjects.Container {
     const g = this.add.graphics()
 
-    // Outer glow
-    g.fillStyle(config.color, 0.15)
-    g.fillCircle(0, 0, config.radius + 10)
+    // Tier-colored outer glow ring
+    g.fillStyle(config.color, 0.13)
+    g.fillCircle(0, 0, config.radius + 11)
 
-    // Body
-    g.fillStyle(config.color, 0.9)
-    g.fillCircle(0, 0, config.radius)
+    // Colored border ring (behind logo)
+    g.fillStyle(config.color, 0.85)
+    g.fillCircle(0, 0, config.radius + 2)
 
-    // Inner highlight
-    g.fillStyle(0xFFFFFF, 0.12)
-    g.fillCircle(-config.radius * 0.2, -config.radius * 0.2, config.radius * 0.45)
+    // White inner ring
+    g.fillStyle(0xFFFFFF, 0.08)
+    g.fillCircle(0, 0, config.radius + 0.5)
 
-    // Border
-    g.lineStyle(2, 0xFFFFFF, 0.25)
-    g.strokeCircle(0, 0, config.radius)
+    const textureKey = `coin_circle_${config.id}`
+    let logo: Phaser.GameObjects.Image | null = null
 
-    // Ticker text
-    const fontSize = config.radius > 28 ? 12 : config.radius > 22 ? 10 : 9
-    const text = this.add.text(0, 0, config.ticker, {
-      fontSize: `${fontSize}px`,
+    if (this.textures.exists(textureKey)) {
+      // Real logo baked into circular texture
+      logo = this.add.image(0, 0, textureKey)
+      logo.setDisplaySize(config.radius * 2, config.radius * 2)
+    } else {
+      // Fallback: colored circle with ticker text
+      g.fillStyle(config.color, 0.9)
+      g.fillCircle(0, 0, config.radius)
+      g.fillStyle(0xFFFFFF, 0.12)
+      g.fillCircle(-config.radius * 0.2, -config.radius * 0.2, config.radius * 0.4)
+    }
+
+    // Ticker label below coin
+    const labelFontSize = config.radius > 28 ? 11 : config.radius > 22 ? 10 : 9
+    const label = this.add.text(0, config.radius + 10, config.ticker, {
+      fontSize: `${labelFontSize}px`,
       fontFamily: "'JetBrains Mono', 'Courier New', monospace",
-      color: '#FFFFFF',
+      color: '#CCCCCC',
       fontStyle: 'bold',
       resolution: 2,
-    }).setOrigin(0.5, 0.5)
+    }).setOrigin(0.5, 0)
 
-    const container = this.add.container(x, y, [g, text])
-    container.setSize(config.radius * 2, config.radius * 2)
+    const children: Phaser.GameObjects.GameObject[] = logo ? [g, logo, label] : [g, label]
+    const container = this.add.container(x, y, children)
+    container.setSize(config.radius * 2 + 20, config.radius * 2 + 24) // slightly larger hit zone
     container.setInteractive({ useHandCursor: false })
     return container
   }
@@ -289,7 +337,7 @@ export class GameScene extends Phaser.Scene {
     if (this.bossTimer) { this.bossTimer.destroy(); this.bossTimer = null }
 
     store.addHit(
-      { ...BOSS_CONFIG, hitRate: 1, payoutMult: 1, spawnWeight: 0, swingAmp: 0, swingFreq: 0, cssColor: BOSS_CONFIG.cssColor, glowColor: BOSS_CONFIG.glowColor },
+      { ...BOSS_CONFIG, logo: '', hitRate: 1, payoutMult: 1, spawnWeight: 0, swingAmp: 0, swingFreq: 0, cssColor: BOSS_CONFIG.cssColor, glowColor: BOSS_CONFIG.glowColor },
       jackpot,
       lootDrop,
     )
